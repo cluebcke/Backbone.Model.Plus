@@ -1,4 +1,4 @@
-module('Backbone.Mutators');
+module('Backbone.Model.Plus');
 
 test("can get 'normal' value", function () {
     expect(2);
@@ -470,3 +470,62 @@ test("can omit transient variables from JSON when saving", 4, function() {
   var modelToJSONSync = model.toJSON({emulateHTTP:false});
   equal(typeof modelToJSONSync.fullName, "undefined");
 });
+
+test("can retrieve nested values from model", function () {
+    expect(3);
+    var Model = Backbone.Model.extend({
+        defaults: {
+            name: {
+                first: "Iain",
+                middleInit: "M",
+                last: "Banks"
+            }
+        }
+    });
+
+    var model = new Model();
+    equal(model.get("name.first"), "Iain");
+    equal(model.get("name.middleInit"), "M");
+    equal(model.get("name.last"), "Banks");
+});
+
+test("can set a new nested value on model", function() {
+    var Model = Backbone.Model.extend({
+
+    });
+    var model = new Model();
+
+    model.set("name.first", "Iain");
+
+    equal(model.get("name.first"), "Iain");
+});
+
+test("can update an existing nested value on model", function() {
+    var Model = Backbone.Model.extend({
+        defaults: {
+            name: {
+                first: "Fred",
+                last: "Flintstone"
+            }
+        }
+    });
+    var model = new Model();
+
+    model.set("name.first", "Iain");
+
+    equal(model.get("name.first"), "Iain");
+});
+
+asyncTest("setting a nested property emits the expected events", function() {
+    var Model = Backbone.Model.extend({
+
+    });
+    var model = new Model();
+    model.on("change:name.first", function() {
+        ok(true);
+        start();
+    });
+
+    model.set("name.first", "Iain");
+});
+

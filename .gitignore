@@ -1,3 +1,5 @@
 docs
 report
 node_modules
+*.iml
+.idea

@@ -1,28 +1,3 @@
-/*! Backbone.Mutators - v0.4.1
-------------------------------
-Build @ 2013-12-01
-Documentation and Full License Available at:
-http://asciidisco.github.com/Backbone.Mutators/index.html
-git://github.com/asciidisco/Backbone.Mutators.git
-Copyright (c) 2013 Sebastian Golasch <public@asciidisco.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the "Software"),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-
-Software is furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-IN THE SOFTWARE.*/
 (function (root, factory, undef) {
     'use strict';
 
@@ -51,16 +26,16 @@ IN THE SOFTWARE.*/
 // Vanilla JS:
 // <script src="underscore.js"></script>
 // <script src="backbone.js"></script>
-// <script src="backbone.mutators.js"></script>
+// <script src="backbone.model.plus.js"></script>
 //
 // Node:
 // var _ = require('underscore');
 // var Backbone = require('backbone');
-// var Mutators = require('backbone.mutators');
+// var ModelPlus = require('backbone.model.plus');
 //
 //
 // AMD:
-// define(['underscore', 'backbone', 'backbone.mutators'], function (_, Backbone, Mutators) {
+// define(['underscore', 'backbone', 'backbone.model.plus'], function (_, Backbone, Mutators) {
 //    // insert sample from below
 //    return User;
 // });
@@ -73,14 +48,14 @@ IN THE SOFTWARE.*/
 //    },
 //
 //    defaults: {
-//        firstname: 'Sebastian',
-//        lastname: 'Golasch'
+//        firstname: 'Chris',
+//        lastname: 'Luebcke'
 //    }
 // });
 //
 // var user = new User();
-// user.get('fullname') // returns 'Sebastian Golasch'
-// user.toJSON() // return '{firstname: 'Sebastian', lastname: 'Golasch', fullname: 'Sebastian Golasch'}'
+// user.get('fullname') // returns 'Chris Luebcke'
+// user.toJSON() // return '{firstname: 'Chris', lastname: 'Luebcke', fullname: 'Chris Luebcke'}'
 
 }(this, function (_, Backbone, root, undef) {
     'use strict';
@@ -90,17 +65,26 @@ IN THE SOFTWARE.*/
     _ = _ === undef ? root._ : _;
 
     // extend backbones model prototype with the mutator functionality
-    var Mutator     = function () {},
+    var ModelPlus   = function () {},
         oldGet      = Backbone.Model.prototype.get,
         oldSet      = Backbone.Model.prototype.set,
         oldToJson   = Backbone.Model.prototype.toJSON;
 
     // This is necessary to ensure that Models declared without the mutators object do not throw and error
-    Mutator.prototype.mutators = {};
+    ModelPlus.prototype.mutators = {};
 
     // override get functionality to fetch the mutator props
-    Mutator.prototype.get = function (attr) {
+    ModelPlus.prototype.get = function (attr) {
         var isMutator = this.mutators !== undef;
+        var path;
+
+        function getNestedValue(object, path) {
+            if (path.length > 1 && typeof object[path[0]] !== "undefined") {
+                getNestedValue(object[path], path.slice(1));
+            } else {
+                return object[path[0]];
+            }
+        }
 
         // check if we have a getter mutation
         if (isMutator === true && _.isFunction(this.mutators[attr]) === true) {
@@ -112,18 +96,40 @@ IN THE SOFTWARE.*/
             return this.mutators[attr].get.call(this);
         }
 
+        if (attr.indexOf(".") > 0) {
+            path = attr.split(".");
+            return getNestedValue(oldGet.call(this, path[0]), path.slice(1));
+        }
+
         return oldGet.call(this, attr);
     };
 
     // override set functionality to set the mutator props
-    Mutator.prototype.set = function (key, value, options) {
+    ModelPlus.prototype.set = function (key, value, options) {
         var isMutator = this.mutators !== undef,
-            ret = null,
-            attrs = null;
+            ret = oldSet.call(this, key, value, options),
+            attrs;
 
-		ret = oldSet.call(this, key, value, options);
+        function setNestedValue(object, path, value) {
+            if (path.length > 1) {
+                if (!hasOwnProperty(object, path[0])) {
+                    object[path[0]] = {};
+                }
+                setNestedValue(object[path], path.slice(1), value);
+            } else {
+                object[path[0]] = value;
+            }
+        }
 
-        // seamleassly stolen from backbone core
+        if (typeof key === "string" && key.indexOf(".") >= 0) {
+            var path = key.split(".");
+            if (this.get(path[0]) === undefined) {
+                this.set(path[0], {});
+            }
+            setNestedValue(this.get(path[0]), path.slice(1), value);
+        }
+
+        // seamlessly stolen from backbone core
         // check if the setter action is triggered
         // using key <-> value or object
         if (_.isObject(key) || key === null) {
@@ -135,7 +141,7 @@ IN THE SOFTWARE.*/
         }
 
         // check if we have a deeper nested setter mutation
-        if (isMutator === true && _.isObject(this.mutators[key]) === true) {
+        if (isMutator && _.isObject(this.mutators[key])) {
 
             // check if we need to set a single value
             if (_.isFunction(this.mutators[key].set) === true) {
@@ -170,7 +176,7 @@ IN THE SOFTWARE.*/
     };
 
     // override toJSON functionality to serialize mutator properties
-    Mutator.prototype.toJSON = function (options) {
+    ModelPlus.prototype.toJSON = function (options) {
         // fetch ye olde values
         var attr = oldToJson.call(this),
             isSaving,
@@ -183,7 +189,7 @@ IN THE SOFTWARE.*/
                 isTransient = this.mutators[name].transient;
                 if (!isSaving || !isTransient) {
                   attr[name] = _.bind(this.mutators[name].get, this)();
-                } 
+                }
             } else {
                 attr[name] = _.bind(this.mutators[name], this)();
             }
@@ -193,15 +199,15 @@ IN THE SOFTWARE.*/
     };
 
     // override get functionality to get HTML-escaped the mutator props
-    Mutator.prototype.escape = function (attr){
+    ModelPlus.prototype.escape = function (attr){
         var val = this.get(attr);
         return _.escape(val == null ? '' : '' + val);
     };
 
     // extend the models prototype
-    _.extend(Backbone.Model.prototype, Mutator.prototype);
+    _.extend(Backbone.Model.prototype, ModelPlus.prototype);
 
     // make mutators globally available under the Backbone namespace
-    Backbone.Mutators = Mutator;
-    return Mutator;
+    Backbone.ModelPlus = ModelPlus;
+    return ModelPlus;
 }));

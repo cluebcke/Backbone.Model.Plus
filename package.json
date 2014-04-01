@@ -1,8 +1,8 @@
 {
-  "name": "Backbone.Mutators",
-  "version": "0.4.1",
-  "description": "Backbone plugin to override getters and setters with logic",
-  "homepage": "http://asciidisco.github.com/Backbone.Mutators/index.html",
+  "name": "backbone.model.plus",
+  "version": "0.1.0",
+  "description": "Backbone plugin that merges adds mutators, nested model support, and (eventually) more",
+  "homepage": "https://github.com/cluebcke/backbone.model.plus",
   "keywords": [
     "backbone",
     "plugin",
@@ -14,14 +14,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/asciidisco/Backbone.Mutators.git"
+    "url": "https://github.com/cluebcke/backbone.model.plus.git"
   },
-  "author": "Sebastian Golasch <public@asciidisco.com>",
+  "author": "Chris Luebcke <cluebcke@yahoo.com>",
   "maintainers": [
     {
-      "name": "Sebastian Golasch (asciidisco)",
-      "email": "public@asciidisco.com",
-      "web": "http://asciidisco.com"
+      "name": "Chris Luebcke (cluebcke)",
+      "email": "cluebcke@yahoo.com"
     }
   ],
   "licenses": [
@@ -30,14 +29,8 @@
       "url": "http://mit-license.org/"
     }
   ],
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/asciidisco/Backbone.Mutators"
-    }
-  ],
   "lib": ".",
-  "main": "backbone.mutators.js",
+  "main": "backbone.model.plus.js",
   "devDependencies": {
     "qunitjs": "~1.11.x",
     "grunt": "~0.4.x",

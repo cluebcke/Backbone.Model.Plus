@@ -1,3 +1,28 @@
+/*! backbone.model.plus - v0.1.0
+------------------------------
+Build @ 2014-03-29
+Documentation and Full License Available at:
+https://github.com/cluebcke/backbone.model.plus
+https://github.com/cluebcke/backbone.model.plus.git
+Copyright (c) 2014 Chris Luebcke <cluebcke@yahoo.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+
+Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.*/
 (function (root, factory, undef) {
     'use strict';
 
@@ -76,6 +101,15 @@
     // override get functionality to fetch the mutator props
     Mutator.prototype.get = function (attr) {
         var isMutator = this.mutators !== undef;
+        var path;
+
+        function getNestedValue(object, path) {
+            if (path.length > 1 && typeof object[path[0]] !== "undefined") {
+                getNestedValue(object[path], path.slice(1));
+            } else {
+                return object[path[0]];
+            }
+        }
 
         // check if we have a getter mutation
         if (isMutator === true && _.isFunction(this.mutators[attr]) === true) {
@@ -87,18 +121,40 @@
             return this.mutators[attr].get.call(this);
         }
 
+        if (attr.indexOf(".") > 0) {
+            path = attr.split(".");
+            return getNestedValue(oldGet.call(this, path[0]), path.slice(1));
+        }
+
         return oldGet.call(this, attr);
     };
 
     // override set functionality to set the mutator props
     Mutator.prototype.set = function (key, value, options) {
         var isMutator = this.mutators !== undef,
-            ret = null,
-            attrs = null;
+            ret = oldSet.call(this, key, value, options),
+            attrs;
 
-		ret = oldSet.call(this, key, value, options);
+        function setNestedValue(object, path, value) {
+            if (path.length > 1) {
+                if (!hasOwnProperty(object, path[0])) {
+                    object[path[0]] = {};
+                }
+                setNestedValue(object[path], path.slice(1), value);
+            } else {
+                object[path[0]] = value;
+            }
+        }
 
-        // seamleassly stolen from backbone core
+        if (typeof key === "string" && key.indexOf(".") >= 0) {
+            var path = key.split(".");
+            if (this.get(path[0]) === undefined) {
+                this.set(path[0], {});
+            }
+            setNestedValue(this.get(path[0]), path.slice(1), value);
+        }
+
+        // seamlessly stolen from backbone core
         // check if the setter action is triggered
         // using key <-> value or object
         if (_.isObject(key) || key === null) {
@@ -110,7 +166,7 @@
         }
 
         // check if we have a deeper nested setter mutation
-        if (isMutator === true && _.isObject(this.mutators[key]) === true) {
+        if (isMutator && _.isObject(this.mutators[key])) {
 
             // check if we need to set a single value
             if (_.isFunction(this.mutators[key].set) === true) {

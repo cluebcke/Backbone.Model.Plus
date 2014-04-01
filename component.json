@@ -1,7 +1,7 @@
 {
-  "name": "Backbone.Mutators",
-  "version": "0.4.1",
-  "main": "backbone.mutators.js",
+  "name": "backbone.mutators.plus",
+  "version": "0.1.0",
+  "main": "backbone.mutators.plus.js",
   "dependencies": {
     "underscore": ">=1.4.4",
     "backbone": ">=1.0.0"

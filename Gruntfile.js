@@ -39,7 +39,7 @@ module.exports = function(grunt) {
 
     plato: {
       bc: {
-        src: ['src/backbone.mutators.js'],
+        src: ['src/backbone.model.plus.js'],
         dest: 'docs/complexity',
         options: {
           jshint : grunt.file.readJSON('.jshintrc')
@@ -50,12 +50,12 @@ module.exports = function(grunt) {
   'saucelabs-qunit': {
     all: {
         options: {
-          username: 'asciidisco',
-          urls: ['http://rawgithub.com/asciidisco/Backbone.Mutators/master/test/index_sauce.html'],
+          username: 'cluebcke',
+          urls: ['https://github.com/cluebcke/backbone.model.plus'],
           tunnelTimeout: 100000,
           testTimeout: 100000,
-          testname: 'Backbone.Mutators',
-          tags: ['backbone', 'plugin', 'mutators', 'unittest'],
+          testname: 'backbone.model.plus',
+          tags: ['backbone', 'plugin', 'mutators', 'nested', 'unittest'],
           build: process.env.TRAVIS_JOB_ID,
           browsers: [ {
             browserName: 'internet explorer',

@@ -1,12 +1,13 @@
 var _ = require('underscore');
 var Backbone = require('Backbone');
-require('../src/backbone.mutators');
+var Model, model;
+require('../src/backbone.model.plus');
 
 exports['require'] = {
 
     "can get 'normal' value": function (test) {
         test.expect(2);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 fullname: function () {
                     return this.firstname + ' ' + this.lastname;
@@ -14,18 +15,18 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
-        model.set('firstname', 'Sebastian');
-        model.set('lastname', 'Golasch');
+        model = new Model();
+        model.set('firstname', 'Chris');
+        model.set('lastname', 'Luebcke');
 
-        test.equal(model.get('firstname'), 'Sebastian', 'Can get unmutated firstname');
-        test.equal(model.get('lastname'), 'Golasch', 'Can get unmutated lastname');
+        test.equal(model.get('firstname'), 'Chris', 'Can get unmutated firstname');
+        test.equal(model.get('lastname'), 'Luebcke', 'Can get unmutated lastname');
         test.done();
     },
 
     "can get 'mutated' value (newly created)": function (test) {
         test.expect(3);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 fullname: function () {
                     return this.get('firstname') + ' ' + this.get('lastname');
@@ -33,18 +34,18 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
-        model.set('firstname', 'Sebastian');
-        model.set('lastname', 'Golasch');
-        test.equal(model.get('firstname'), 'Sebastian', 'Can get unmutated firstname');
-        test.equal(model.get('lastname'), 'Golasch', 'Can get unmutated lastname');
-        test.equal(model.get('fullname'), 'Sebastian Golasch', 'Can get mutated fullname');
+        model = new Model();
+        model.set('firstname', 'Chris');
+        model.set('lastname', 'Luebcke');
+        test.equal(model.get('firstname'), 'Chris', 'Can get unmutated firstname');
+        test.equal(model.get('lastname'), 'Luebcke', 'Can get unmutated lastname');
+        test.equal(model.get('fullname'), 'Chris Luebcke', 'Can get mutated fullname');
         test.done();
     },
 
     "can get 'mutated' value (overridden)": function (test) {
         test.expect(5);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: function (key, value, options, set) {
                     if(key){
@@ -56,7 +57,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         model.set('overallStatus', 1);
         model.set('underestimatedNonOverallStatus', 3);
         model.set('status', 2);
@@ -71,7 +72,7 @@ exports['require'] = {
 
     "can get 'normal' value - object context": function (test) {
         test.expect(2);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 fullanme: {
                     get: function () {
@@ -81,18 +82,18 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
-        model.set('firstname', 'Sebastian');
-        model.set('lastname', 'Golasch');
+        model = new Model();
+        model.set('firstname', 'Chris');
+        model.set('lastname', 'Luebcke');
 
-        test.equal(model.get('firstname'), 'Sebastian', 'Can get unmutated firstname');
-        test.equal(model.get('lastname'), 'Golasch', 'Can get unmutated lastname');
+        test.equal(model.get('firstname'), 'Chris', 'Can get unmutated firstname');
+        test.equal(model.get('lastname'), 'Luebcke', 'Can get unmutated lastname');
         test.done();
     },
 
     "can get 'mutated' value (newly created) - object context": function (test) {
         test.expect(3);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 fullname: {
                     get: function () {
@@ -102,19 +103,19 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
-        model.set('firstname', 'Sebastian');
-        model.set('lastname', 'Golasch');
+        model = new Model();
+        model.set('firstname', 'Chris');
+        model.set('lastname', 'Luebcke');
 
-        test.equal(model.get('firstname'), 'Sebastian', 'Can get unmutated firstname');
-        test.equal(model.get('lastname'), 'Golasch', 'Can get unmutated lastname');
-        test.equal(model.get('fullname'), 'Sebastian Golasch', 'Can get mutated fullname');
+        test.equal(model.get('firstname'), 'Chris', 'Can get unmutated firstname');
+        test.equal(model.get('lastname'), 'Luebcke', 'Can get unmutated lastname');
+        test.equal(model.get('fullname'), 'Chris Luebcke', 'Can get mutated fullname');
         test.done();
     },
 
     "can get 'mutated' value (overridden) - object context": function (test) {
         test.expect(5);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     get: function () {
@@ -124,7 +125,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         model.set('overallStatus', 1);
         model.set('underestimatedNonOverallStatus', 3);
         model.set('status', 2);
@@ -139,7 +140,7 @@ exports['require'] = {
 
     "can set 'normal' value (key <-> value)": function (test) {
         test.expect(1);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function () {
@@ -149,7 +150,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         model.set('overallStatus', 1);
 
         test.equal(model.get('overallStatus'), 1, 'Can get unmutated overallStatus');
@@ -158,7 +159,7 @@ exports['require'] = {
 
     "can set 'mutated' value (key <-> value)": function (test) {
         test.expect(2);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function (key, value, options) {
@@ -169,7 +170,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         model.set('status', {pState: 1, aState: 2});
 
         test.equal(model.get('pState'), 1, 'Can get mutated pState');
@@ -179,7 +180,7 @@ exports['require'] = {
 
     "can set 'normal' value (object)": function (test) {
         test.expect(1);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function () {
@@ -189,7 +190,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         model.set({overallStatus: 1});
 
         test.equal(model.get('overallStatus'), 1, 'Can get unmutated overallStatus');
@@ -198,7 +199,7 @@ exports['require'] = {
 
     "can set attribute objects": function (test) {
         test.expect(3);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 fullname: {
                     set: function (key, value, options) {
@@ -210,18 +211,18 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
-        model.set({ fullname: 'Sebastian Golasch', admin: true });
+        model = new Model();
+        model.set({ fullname: 'Chris Luebcke', admin: true });
 
-        test.equal(model.get('firstname'), 'Sebastian', 'Can get the firstname');
-        test.equal(model.get('lastname'), 'Golasch', 'Can get the lastname');
+        test.equal(model.get('firstname'), 'Chris', 'Can get the firstname');
+        test.equal(model.get('lastname'), 'Luebcke', 'Can get the lastname');
         test.equal(model.get('admin'), true, 'Can get the admin status');
         test.done();
     },
 
     "can set newly created 'mutated' value (object)": function (test) {
         test.expect(2);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function (key, value, options) {
@@ -232,7 +233,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         model.set({status: {pState: 1, aState: 2, dState: 3}});
 
         test.equal(model.get('pState'), 1, 'Can get mutated pState');
@@ -242,7 +243,7 @@ exports['require'] = {
 
     "can set 'mutated' value (object)": function (test) {
         test.expect(4);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function (key, value, options, set) {
@@ -263,7 +264,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
 
         test.equal(model.get('status'), 'awkward', 'Can get unmodified value');
         model.set({status: {pState: 1, aState: 2, dState: 3}});
@@ -275,7 +276,7 @@ exports['require'] = {
 
     "can set a 'mutated' value and fire event": function (test) {
         test.expect(3);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function (key, value, options, set) {
@@ -288,7 +289,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
 
         model.bind('mutators:set:status', function () {
             test.ok(true, 'Callback called');
@@ -302,7 +303,7 @@ exports['require'] = {
 
     "can set 'mutated' value and fire a mutated event": function (test) {
         test.expect(2);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function (key, value, options, set) {
@@ -315,7 +316,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
 
         model.bind('mutators:set:status', function () {
             test.ok(true, 'Callback called (And this shouldn´t happen)');
@@ -329,7 +330,7 @@ exports['require'] = {
 
     "can set 'mutated' value and fire event": function (test) {
         test.expect(4);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators: {
                 status: {
                     set: function (key, value, options, set) {
@@ -342,7 +343,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
 
         model.bind('mutators:set:status', function () {
             test.ok(true, 'Callback called (And this shouldn´t happen)');
@@ -360,7 +361,7 @@ exports['require'] = {
 
     "can serialize an unmutated model": function (test) {
         test.expect(2);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             defaults: {
                 a: 'a',
                 b: 'b'
@@ -374,7 +375,7 @@ exports['require'] = {
 
     "can serialize mutated model": function (test) {
         test.expect(3);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             defaults: {
                 a: 'a',
                 b: 'b'
@@ -394,7 +395,7 @@ exports['require'] = {
 
     "can escape mutated properties": function (test) {
         test.expect(2);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             defaults: {
                 a: 'a',
                 b: 'b'
@@ -406,7 +407,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         test.equal(model.get('b'), 'c');
         model.set('b', 'foobar');
         test.equal(model.get('b'), 'c');
@@ -415,7 +416,7 @@ exports['require'] = {
 
     "can get/set using single method": function (test) {
         test.expect(6);
-        var Model = Backbone.Model.extend({
+        Model = Backbone.Model.extend({
             mutators:{
                 state:function(key, value){
                     if(key){
@@ -428,7 +429,7 @@ exports['require'] = {
             }
         });
 
-        var model = new Model();
+        model = new Model();
         var value = "happy";
         model.set('state', value);
 
@@ -449,7 +450,7 @@ exports['require'] = {
     
     "can omit transient variables from JSON when saving": function(test) {
       test.expect(4);
-      var Model = Backbone.Model.extend({
+      Model = Backbone.Model.extend({
         defaults:{
           firstName:"Iain",
           middleInit:"M",
@@ -468,7 +469,7 @@ exports['require'] = {
         }
       });
   
-      var model = new Model();
+      model = new Model();
       // First make sure we didn't break the accessor (or the normal model property
       // access)
       test.equal(model.get("fullName"), "Iain M. Banks");
@@ -476,12 +477,12 @@ exports['require'] = {
   
       // Ensure that a normal toJSON call (like you'd use with a template) includes
       // the computed value
-      var modelToJSON = model.toJSON();
+      modelToJSON = model.toJSON();
       test.equal(modelToJSON.fullName, "Iain M. Banks");
   
       // Backbone always sets 'emulateHTTP' to true or (usually) false when syncing, 
       // so we use the existence of that property as a proxy for "yes I'm syncing"
-      var modelToJSONSync = model.toJSON({emulateHTTP:false});
+      modelToJSONSync = model.toJSON({emulateHTTP:false});
       test.equal(typeof modelToJSONSync.fullName, "undefined");
       test.done();
     }

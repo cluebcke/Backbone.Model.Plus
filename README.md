@@ -1,5 +1,6 @@
-## Backbone.Mutators
-Backbone plugin to override getters and setters with logic
+## Backbone.Model.Plus
+Backbone plugin that provides support for accessors, mutators and nested
+objects.
 
 ## Build Status, Project Page, Annotated Source & Tests
 [![Build Status](https://secure.travis-ci.org/asciidisco/Backbone.Mutators.png?branch=master)](http://travis-ci.org/asciidisco/Backbone.Mutators)
@@ -10,8 +11,11 @@ Backbone plugin to override getters and setters with logic
 [NPM registry](http://search.npmjs.org/#/Backbone.Mutators)
 
 ## Introduction
-Ever wanted Backbone to have getters and setters you can override with your own logic?
-Yes?! Then Backbone.Mutators is the missing tool in your chain...
+Backbone.Model.Plus is a fork of [Backbone.Mutators]((http://asciidisco.github.com/Backbone.Mutators/index.html)
+that adds support for nested objects in the model (e.g. name.first). I created
+this fork because I love and rely upon Backbone.Mutators, but since it overrides
+Backbone's get() and set() methods, I can't use it in conjunction with other
+model plugins (like [backbone-deep-model](https://github.com/powmedia/backbone-deep-model)).
 
 ## Installation
 
@@ -23,27 +27,17 @@ The plugin has two dependencies, underscore.js and backbone.js
 
 ### Download
 You can directly download the
-[Development Version](https://raw.github.com/asciidisco/Backbone.Mutators/master/backbone.mutators.js)
+[Development Version](https://raw.github.com/cluebcke/Backbone.Model.Plus/master/backbone.model.plus.js)
 or the
-[Production Version](https://raw.github.com/asciidisco/Backbone.Mutators/master/backbone.mutators.min.js)
+[Production Version](https://raw.github.com/cluebcke/Backbone.Model.Plus/master/backbone.model.plus.min.js)
 from the root folder
-
-### VOLO
-```shell
-$ volo add Backbone.Mutators
-```
-
-### NPM
-```shell
-$ npm install Backbone.Mutators
-```
 
 ## Integration
 
 ### AMD
 ```javascript
 // AMD
-require(['underscore', 'backbone', 'path/to/backbone.mutators'], function (_, Backbone, Mutators) {
+require(['underscore', 'backbone', 'path/to/backbone.model.plus'], function (_, Backbone, ModelPlus) {
   /* Do stuff with Backbone here */
 });
 ```
@@ -53,7 +47,7 @@ require(['underscore', 'backbone', 'path/to/backbone.mutators'], function (_, Ba
 // CommonJS
 var _ = require('underscore');
 var Backbone = require('backbone');
-var Mutators = require('backbone.mutators');
+var Mutators = require('backbone.model.plus');
 ```
 
 ### Vanilla JS
@@ -61,9 +55,9 @@ var Mutators = require('backbone.mutators');
 <!-- Vanilla javascript -->
 <script src="path/to/underscore.js"></script>
 <script src="path/to/backbone.js"></script>
-<script src="path/to/backbone.mutators.js"></script>
+<script src="path/to/backbone.model.plus.js"></script>
 <script>
-	console.log(Backbone.Mutators); // Backbone and the Mutators property are globals
+	console.log(Backbone.ModelPlus); // Backbone and the Mutators property are globals
 </script>
 ```
 
@@ -315,7 +309,7 @@ Some lines of code explain more then thousand words...
 ```
 
 ### Define a getter as transient
-Defining a getter as transient means that it will be omitted when Backbone saves the model. This is 
+Defining a getter as transient means that it will be omitted when Backbone saves the model. This is
 useful if the backend system (whatever Backbone is syncing to) fails if you send it a property that does
 not actually exist on the model. Note that this only works for mutators defined with a `get()`
 function.
