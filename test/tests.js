@@ -489,6 +489,13 @@ test("can retrieve nested values from model", function () {
     equal(model.get("name.last"), "Banks");
 });
 
+test("returns undefined when attempting to retrieve a nested property whose parent does not exist", function() {
+    expect(1);
+    var Model = Backbone.Model.extend({});
+    var model = new Model();
+    equal(typeof model.get("this.does.not.exist"), "undefined");
+});
+
 test("can set a new nested value on model", function() {
     var Model = Backbone.Model.extend({
 

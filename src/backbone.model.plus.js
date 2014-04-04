@@ -79,6 +79,9 @@
         var path;
 
         function getNestedValue(object, path) {
+            if (typeof object !== "object") {
+                return;
+            }
             if (path.length > 1 && typeof object[path[0]] !== "undefined") {
                 getNestedValue(object[path], path.slice(1));
             } else {
@@ -96,7 +99,7 @@
             return this.mutators[attr].get.call(this);
         }
 
-        if (attr.indexOf(".") > 0) {
+        if (typeof attr === "string" && attr.indexOf(".") > 0) {
             path = attr.split(".");
             return getNestedValue(oldGet.call(this, path[0]), path.slice(1));
         }
@@ -188,7 +191,9 @@
                 isSaving = _.has(options || {}, 'emulateHTTP');
                 isTransient = this.mutators[name].transient;
                 if (!isSaving || !isTransient) {
-                  attr[name] = _.bind(this.mutators[name].get, this)();
+                    attr[name] = _.bind(this.mutators[name].get, this)();
+                } else if(attr[name]) {
+                    delete(attr[name]);
                 }
             } else {
                 attr[name] = _.bind(this.mutators[name], this)();
