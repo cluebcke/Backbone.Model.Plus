@@ -449,6 +449,7 @@ exports['require'] = {
     },
     
     "can omit transient variables from JSON when saving": function(test) {
+      var modelToJSON, modelToJSONSync;
       test.expect(4);
       Model = Backbone.Model.extend({
         defaults:{
