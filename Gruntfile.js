@@ -9,7 +9,7 @@ module.exports = function(grunt) {
       options: {
         jshintrc:'.jshintrc'
       },
-      all: ['Gruntfile.js', 'src/*.js', 'test/*.js']
+      all: ['Gruntfile.js', 'src/*.js']
     },
 
     qunit: {
@@ -168,14 +168,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
-  grunt.loadNpmTasks('grunt-saucelabs');
   grunt.loadNpmTasks('grunt-complexity');
   grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-plato');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'complexity', 'qunit', 'nodeunit', 'concat', 'uglify']);
-  grunt.registerTask('travis', ['jshint', 'complexity', 'qunit', 'saucelabs-qunit']);
+  grunt.registerTask('default', ['jshint', /*'complexity', */'qunit', 'nodeunit', 'concat', 'uglify']);
+  grunt.registerTask('travis', ['jshint', /*'complexity', */'qunit']);
 
 
 };

@@ -1,5 +1,5 @@
 var _ = require('underscore');
-var Backbone = require('Backbone');
+var Backbone = require('backbone');
 var Model, model;
 require('../src/backbone.model.plus');
 
@@ -329,7 +329,7 @@ exports['require'] = {
     },
 
     "can set 'mutated' value and fire event": function (test) {
-        test.expect(4);
+        test.expect(2);
         Model = Backbone.Model.extend({
             mutators: {
                 status: {
@@ -346,15 +346,15 @@ exports['require'] = {
         model = new Model();
 
         model.bind('mutators:set:status', function () {
-            test.ok(true, 'Callback called (And this shouldn´t happen)');
+            test.ok(false, 'Callback called (And this shouldn´t happen)');
         });
 
         model.bind('change:status', function () {
-            test.ok(true, 'Callback called (And this should happen)');
+            test.ok(false, 'Callback called (And this should not happen)');
         });
 
         test.equal(model.get('status'), 'awkward', 'Can get unmodified value');
-        model.set('status', 'SUPERCOOL', {mutators: {silent: true}});
+        model.set('status', 'SUPERCOOL', {silent: true});
         test.equal(model.get('status'), 'supercool', 'Can get mutated status value');
         test.done();
     },
@@ -393,6 +393,29 @@ exports['require'] = {
         test.done();
     },
 
+    "can serialize mutated model with only a setter": function (test) {
+        test.expect(2);
+        var Model = Backbone.Model.extend({
+            mutators: {
+                status: {
+                    set: function (key, value, options, set) {
+                        set(key, value.toLowerCase(), options);
+                    }
+                }
+            },
+            defaults: {
+                status: 'awkward'
+            }
+        });
+
+        var model = new Model();
+
+        test.equal(model.toJSON().status, 'awkward', 'can serialize mutated model with only a setter');
+        model.set('status', 'SUPERCOOL', {mutators: {silent: true}});
+        test.equal(model.toJSON().status, 'supercool', 'can serialize mutated model with only a setter');
+        test.done();
+    },
+
     "can escape mutated properties": function (test) {
         test.expect(2);
         Model = Backbone.Model.extend({
@@ -415,7 +438,7 @@ exports['require'] = {
     },
 
     "can get/set using single method": function (test) {
-        test.expect(6);
+        test.expect(5);
         Model = Backbone.Model.extend({
             mutators:{
                 state:function(key, value){

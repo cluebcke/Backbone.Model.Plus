@@ -171,7 +171,11 @@ test("can set 'normal' value (object)", function () {
         mutators: {
             status: {
                 set: function () {
-                    return { status: this.attributes.status, overallStatus: this.get('overallStatus'), underestimatedNonOverallStatus: this.get('underestimatedNonOverallStatus') };
+                    return {
+                        status: this.attributes.status,
+                        overallStatus: this.get('overallStatus'),
+                        underestimatedNonOverallStatus: this.get('underestimatedNonOverallStatus')
+                    };
                 }
             }
         }
@@ -303,7 +307,7 @@ test("can set 'mutated' value and fire event", function () {
     var model = new Model();
 
     model.bind('mutators:set:status', function () {
-        ok(true, 'Callback called (And this shouldn´t happen)');
+        ok(false, 'Callback called (And this shouldn´t happen)');
     });
 
     equal(model.get('status'), 'awkward', 'Can get unmodified value');
@@ -313,7 +317,7 @@ test("can set 'mutated' value and fire event", function () {
 });
 
 test("can set 'mutated' value and fire event", function () {
-    expect(4);
+    expect(2);
     var Model = Backbone.Model.extend({
         mutators: {
             status: {
@@ -330,15 +334,15 @@ test("can set 'mutated' value and fire event", function () {
     var model = new Model();
 
     model.bind('mutators:set:status', function () {
-        ok(true, 'Callback called (And this shouldn´t happen)');
+        ok(false, 'Callback called (And this shouldn´t happen)');
     });
 
     model.bind('change:status', function () {
-        ok(true, 'Callback called (And this should happen)');
+        ok(false, 'Callback called (And this should not happen)');
     });
 
     equal(model.get('status'), 'awkward', 'Can get unmodified value');
-    model.set('status', 'SUPERCOOL', {mutators: {silent: true}});
+    model.set('status', 'SUPERCOOL', {silent: true});
     equal(model.get('status'), 'supercool', 'Can get mutated status value');
 
 });
@@ -395,7 +399,7 @@ test("can escape mutated properties", function () {
     equal(model.get('b'), 'c');
 });
 
-test("can get/set using single method", 6, function(){
+test("can get/set using single method", 5, function(){
 
     var Model = Backbone.Model.extend({
         mutators:{
@@ -419,9 +423,8 @@ test("can get/set using single method", 6, function(){
 
     equal(model.get('state'), value);
 
-    var new_state = "excited",
-    new_level = 10;
-
+    var new_state = "excited";
+    var new_level = 10;
 
     //set multiple
     model.set({
@@ -523,16 +526,164 @@ test("can update an existing nested value on model", function() {
     equal(model.get("name.first"), "Iain");
 });
 
-asyncTest("setting a nested property emits the expected events", function() {
+test("setting a nested property emits the expected events", function() {
     var Model = Backbone.Model.extend({
 
     });
     var model = new Model();
     model.on("change:name.first", function() {
         ok(true);
-        start();
     });
 
     model.set("name.first", "Iain");
 });
 
+test("Can unset a nested property", function() {
+    var Model = Backbone.Model.extend({
+        defaults: {
+            please: {
+                delete: "me"
+            }
+        }
+    });
+    var model = new Model();
+    model.unset("please.delete");
+    equal(typeof model.get("please.delete"), "undefined");
+    model.unset("please");
+    equal(typeof model.get("please"), "undefined");
+});
+
+test("Change event for a field set by a mutator should be emitted after setters are executed", function() {
+    var Model = Backbone.Model.extend({
+        defaults: {
+            firstName: "Hot",
+            lastName: "Dog"
+        },
+        mutators: {
+            fullName: {
+                get: function() {
+                    return this.get("firstName") + " " + this.get("lastName");
+                },
+                set: function(key, value, options, set) {
+                    var name = value.split(" ");
+                    this.set("firstName", name[0]);
+                    this.set("lastname", name[1]);
+                }
+            }
+        }
+    });
+    var model = new Model();
+    model.on("change:firstName", function(model, value, options) {
+        equal(model.get("firstName"), "Wiley");
+    });
+    model.set("fullName", "Wiley Coyote");
+});
+
+test("Change event for the mutator should be emitted after setters are executed", function() {
+    var Model = Backbone.Model.extend({
+        defaults: {
+            firstName: "Bob",
+            lastName: "Cat"
+        },
+        mutators: {
+            fullName: {
+                get: function() {
+                    return this.get("firstName") + " " + this.get("lastName");
+                },
+                set: function(key, value, options, set) {
+                    var name = value.split(" ");
+                    this.set("firstName", name[0]);
+                    this.set("lastname", name[1]);
+                }
+            }
+        }
+    });
+    var model = new Model();
+    model.on("change:fullName", function(model, value, options) {
+       equal(model.get("firstName"), "Johnny");
+    });
+    model.set("fullName", "Johnny Dog");
+});
+
+test("Mutators can have dotted names", function() {
+    var Model = Backbone.Model.extend({
+        defaults: {
+            dont: {
+                set: {
+                    me: "bro"
+                }
+            }
+        },
+        mutators: {
+            "dont.set.me": function() {
+                return "dude"
+            }
+        }
+    });
+    var model = new Model();
+    model.set("dont.set.me", "sis");
+    equal(model.get("dont.set.me"), "dude");
+    equal(model.attributes.dont.set.me, "bro");
+});
+
+test("Setting a nested property will create intermediary objects when needed", function() {
+    var Model = Backbone.Model.extend({
+    });
+    var model = new Model();
+    model.set("here.is.a.deeply.nested", "string");
+    equal(model.get("here.is.a.deeply.nested"), "string");
+});
+
+test("Can serialize mutated model with only a setter", function () {
+    expect(2);
+    var Model = Backbone.Model.extend({
+        mutators: {
+            status: {
+                set: function (key, value, options, set) {
+                    set(key, value.toLowerCase(), options);
+                }
+            }
+        },
+        defaults: {
+            status: 'awkward'
+        }
+    });
+
+    var model = new Model();
+
+    equal(model.toJSON().status, 'awkward', 'can serialize mutated model');
+    model.set('status', 'SUPERCOOL', {mutators: {silent: true}});
+    equal(model.toJSON().status, 'supercool', 'can serialize mutated model');
+});
+
+test("Can set mutated, nested and 'normal' values in the same call to save", function() {
+    var Model = Backbone.Model.extend({
+        mutators: {
+            mutato: {
+                get: function() {
+                    return this.get("potato");
+                },
+                set: function(key, value, options, set) {
+                    this.set("potato", value);
+                }
+            }
+        },
+        defaults: {
+            nested: {
+                values: {
+                    are: "just okay"
+                }
+            },
+            normal: "values are awesome"
+        }
+    });
+    var model = new Model();
+    model.set({
+        "mutato": "french fries",
+        "nested.values.are": "awesome",
+        "normal": "values are boring"
+    });
+    equal(model.get("mutato"), "french fries");
+    equal(model.get("nested.values.are"), "awesome");
+    equal(model.get("normal"), "values are boring");
+});

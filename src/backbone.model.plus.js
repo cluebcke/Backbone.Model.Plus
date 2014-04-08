@@ -5,7 +5,7 @@
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like enviroments that support module.exports,
         // like Node.
-        module.exports = factory(require('underscore'), require('Backbone'));
+        module.exports = factory(require('underscore'), require('backbone'));
     } else if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(['underscore', 'backbone'], function (_, Backbone) {
@@ -83,7 +83,7 @@
                 return;
             }
             if (path.length > 1 && typeof object[path[0]] !== "undefined") {
-                getNestedValue(object[path], path.slice(1));
+                return getNestedValue(object[path[0]], path.slice(1));
             } else {
                 return object[path[0]];
             }
@@ -107,75 +107,154 @@
         return oldGet.call(this, attr);
     };
 
-    // override set functionality to set the mutator props
+    // Because Backbone.Model's set() operation does a number of different things,
+    // like running validation and emitting events, in addition to actually setting
+    // values in the model, there isn't really a clean way to use it while also
+    // supporting mutators, nested properties, etc. So, this a mixture of
+    // copy/paste and rewrite from Backbone (as well as Backbone.Mutators, of
+    // course.
     ModelPlus.prototype.set = function (key, value, options) {
-        var isMutator = this.mutators !== undef,
-            ret = oldSet.call(this, key, value, options),
-            attrs;
+        var attribute, attributes, unset, changes, silent, changing, previousAttributes,
+            hasMutators, path, newValue, currentValue, setter, valueSet, i;
 
         function setNestedValue(object, path, value) {
             if (path.length > 1) {
-                if (!hasOwnProperty(object, path[0])) {
+                if (!object.hasOwnProperty(path[0])) {
                     object[path[0]] = {};
                 }
-                setNestedValue(object[path], path.slice(1), value);
+                setNestedValue(object[path[0]], path.slice(1), value);
             } else {
-                object[path[0]] = value;
+                if (unset) {
+                    delete object[path[0]];
+                } else {
+                    object[path[0]] = value;
+                }
             }
         }
 
-        if (typeof key === "string" && key.indexOf(".") >= 0) {
-            var path = key.split(".");
-            if (this.get(path[0]) === undefined) {
-                this.set(path[0], {});
-            }
-            setNestedValue(this.get(path[0]), path.slice(1), value);
+        hasMutators = !!this.mutators;
+
+        if (!key) {
+            return this;
         }
 
-        // seamlessly stolen from backbone core
-        // check if the setter action is triggered
-        // using key <-> value or object
-        if (_.isObject(key) || key === null) {
-            attrs = key;
+        if (typeof key === "object") {
+            attributes = key;
             options = value;
         } else {
-            attrs = {};
-            attrs[key] = value;
+            attributes = {};
+            attributes[key] = value;
         }
 
-        // check if we have a deeper nested setter mutation
-        if (isMutator && _.isObject(this.mutators[key])) {
+        options = options || (options = {});
 
-            // check if we need to set a single value
-            if (_.isFunction(this.mutators[key].set) === true) {
-                ret = this.mutators[key].set.call(this, key, attrs[key], options, _.bind(oldSet, this));
-            } else if(_.isFunction(this.mutators[key])){
-                ret = this.mutators[key].call(this, key, attrs[key], options, _.bind(oldSet, this));
+        // Run validation
+        if (!this._validate(attributes, options)) {
+            return false;
+        }
+
+        // Extract attributes and options
+        unset = options.unset;
+        silent = options.silent;
+        changes = [];
+        changing = this._changing;
+        this._changing = true;
+
+        // Check for changes of `id`.
+        if (this.idAttribute in attributes) {
+            this.id = attributes[this.idAttribute];
+        }
+
+        if (!changing) {
+            // We need to pull previous values via the get() function, so that
+            // computed and nested values are included
+            this._previousAttributes = {};
+            for (attribute in this.attributes) {
+                this._previousAttributes[attribute] = this.get(attribute);
+            }
+            this.changed = {};
+        }
+        previousAttributes = this._previousAttributes;
+
+        for (attribute in attributes) {
+            valueSet = false;
+            newValue = attributes[attribute];
+            currentValue = this.get(attribute);
+
+            // Queue up only the values that have actually changed
+            if (!_.isEqual(this.get(attribute), newValue)) {
+                changes.push(attribute);
+            }
+
+            // Queue up a list of attributes to trigger change events for
+            // (but remove any previously set attributes that have now been
+            // set back to their previous value)
+            if (_.isEqual(previousAttributes[attribute], newValue)) {
+                delete this.changed[attribute];
+            } else {
+                this.changed[attribute] = newValue;
+            }
+
+            // Apply to mutator if there is one
+            if (hasMutators && this.mutators[attribute]) {
+                if (_.isFunction(this.mutators[attribute].set)) {
+                    setter = this.mutators[attribute].set;
+                } else if (_.isFunction(this.mutators[attribute])) {
+                    setter = this.mutators[attribute];
+                } else {
+                    setter = null;
+                }
+                if (setter) {
+                    setter.call(this, attribute, newValue, options, _.bind(oldSet, this));
+                    valueSet = true;
+                    if (!silent) {
+                        this.trigger("mutators:set:" + attribute);
+                    }
+                }
+            }
+
+            // Apply as a nested property if it wasn't a mutator
+            if (!valueSet && attribute.indexOf(".") > 0) {
+                path = attribute.split(".");
+                if (this.get(path[0]) === undefined) {
+                    this.set(path[0], {});
+                }
+                setNestedValue(this.get(path[0]), path.slice(1), newValue);
+                valueSet = true;
+            }
+
+            // Apply as a regular property if none of the above were true
+            if (!valueSet) {
+                if (unset) {
+                    delete this.attributes[attribute];
+                } else {
+                    this.attributes[attribute] = newValue;
+                }
             }
         }
 
-        if (isMutator === true && _.isObject(attrs)) {
-            _.each(attrs, _.bind(function (attr, attrKey) {
-                if (_.isObject(this.mutators[attrKey]) === true) {
-                    // check if we need to set a single value
-
-                    var meth = this.mutators[attrKey];
-                    if(_.isFunction(meth.set)){
-                        meth = meth.set;
-                    }
-
-                    if(_.isFunction(meth)){
-                        if (options === undef || (_.isObject(options) === true && options.silent !== true && (options.mutators !== undef && options.mutators.silent !== true))) {
-                            this.trigger('mutators:set:' + attrKey);
-                        }
-                        meth.call(this, attrKey, attr, options, _.bind(oldSet, this));
-                    }
-
-                }
-            }, this));
+        // Trigger all relevant attribute changes.
+        if (!silent) {
+            if (changes.length > 0) {
+                this._pending = true;
+            }
+            for (i = 0; i < changes.length; i++) {
+                this.trigger("change:" + changes[i], this, this.get(changes[i]), options);
+            }
         }
 
-        return ret;
+        if (!changing) {
+            if (!silent) {
+                while (this._pending) {
+                    this._pending = false;
+                    this.trigger("change", this, options);
+                }
+            }
+            this._pending = false;
+            this._changing = false;
+        }
+
+        return this;
     };
 
     // override toJSON functionality to serialize mutator properties
@@ -195,7 +274,7 @@
                 } else if(attr[name]) {
                     delete(attr[name]);
                 }
-            } else {
+            } else if (_.isFunction(this.mutators[name])) {
                 attr[name] = _.bind(this.mutators[name], this)();
             }
         }, this));
