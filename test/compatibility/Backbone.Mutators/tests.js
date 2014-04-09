@@ -417,7 +417,10 @@ test("can escape mutated properties", function () {
     equal(model.get('b'), 'c');
 });
 
-test("can get/set using single method", 6, function(){
+// MODIFIED in Backbone.Model.Plus
+// In Backbone.Mutators, model.set was calling the function twice with the same key and value.
+// This was an error and is fixed in Backbone.Model.Plus
+test("can get/set using single method", 5, function(){
 
     var Model = Backbone.Model.extend({
         mutators:{
