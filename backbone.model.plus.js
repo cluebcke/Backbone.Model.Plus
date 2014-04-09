@@ -1,6 +1,6 @@
-/*! backbone.model.plus - v0.1.0
+/*! backbone.model.plus - v0.2.0
 ------------------------------
-Build @ 2014-04-08
+Build @ 2014-04-09
 Documentation and Full License Available at:
 https://github.com/cluebcke/backbone.model.plus
 https://github.com/cluebcke/backbone.model.plus.git
@@ -211,9 +211,6 @@ IN THE SOFTWARE.*/
                 changes.push(attribute);
             }
 
-            // Queue up a list of attributes to trigger change events for
-            // (but remove any previously set attributes that have now been
-            // set back to their previous value)
             if (_.isEqual(previousAttributes[attribute], newValue)) {
                 delete this.changed[attribute];
             } else {
@@ -232,7 +229,7 @@ IN THE SOFTWARE.*/
                 if (setter) {
                     setter.call(this, attribute, newValue, options, _.bind(oldSet, this));
                     valueSet = true;
-                    if (!silent) {
+                    if (!silent && (!options.mutators || !options.mutators.silent)) {
                         this.trigger("mutators:set:" + attribute);
                     }
                 }

@@ -1,7 +1,7 @@
 {
   "name": "backbone.model.plus",
-  "version": "0.1.0",
-  "description": "Backbone plugin that merges adds mutators, nested model support, and (eventually) more",
+  "version": "0.2.0",
+  "description": "Backbone plugin that adds mutators, nested model support, and (eventually) more",
   "homepage": "https://github.com/cluebcke/backbone.model.plus",
   "keywords": [
     "backbone",
