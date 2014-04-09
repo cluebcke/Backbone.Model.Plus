@@ -204,7 +204,7 @@
                 if (setter) {
                     setter.call(this, attribute, newValue, options, _.bind(oldSet, this));
                     valueSet = true;
-                    if (!silent) {
+                    if (!silent && (!options.mutators || !options.mutators.silent)) {
                         this.trigger("mutators:set:" + attribute);
                     }
                 }

@@ -263,7 +263,7 @@ test("can set 'mutated' value (object)", function () {
 });
 
 test("can set 'mutated' value and fire event", function () {
-    expect(3);
+    expect(2);
     var Model = Backbone.Model.extend({
         mutators: {
             status: {
@@ -280,11 +280,11 @@ test("can set 'mutated' value and fire event", function () {
     var model = new Model();
 
     model.bind('mutators:set:status', function () {
-        ok(true, 'Callback called');
+        ok(true, 'Callback called (and this should not happen');
     });
 
     equal(model.get('status'), 'awkward', 'Can get unmodified value');
-    model.set({status: 'SUPERCOOL'});
+    model.set('status', 'SUPERCOOL', {mutators: {silent: true}});
     equal(model.get('status'), 'supercool', 'Can get mutated status value');
 
 });
@@ -402,16 +402,14 @@ test("can escape mutated properties", function () {
 test("can get/set using single method", 5, function(){
 
     var Model = Backbone.Model.extend({
-        mutators:{
-            state:function(key, value){
-                if(key){
+        mutators: {
+            state: function(key, value){
+                if (key) {
                     this.set("a", value);
-
                     equal(arguments.length, 4);
-                    return null; //prevents ret from returning
+                } else {
+                    return this.get("a");
                 }
-
-                return this.get("a");
             }
         }
     });
@@ -426,7 +424,8 @@ test("can get/set using single method", 5, function(){
     var new_state = "excited";
     var new_level = 10;
 
-    //set multiple
+    // Set multiple values with a single object
+    // Only one call to the state mutator should be made here
     model.set({
         level:new_level,
         state:new_state
