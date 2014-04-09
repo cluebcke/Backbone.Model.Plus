@@ -500,6 +500,7 @@ test("returns undefined when attempting to retrieve a nested property whose pare
 });
 
 test("can set a new nested value on model", function() {
+    expect(1);
     var Model = Backbone.Model.extend({
 
     });
@@ -511,6 +512,7 @@ test("can set a new nested value on model", function() {
 });
 
 test("can update an existing nested value on model", function() {
+    expect(1);
     var Model = Backbone.Model.extend({
         defaults: {
             name: {
@@ -527,6 +529,7 @@ test("can update an existing nested value on model", function() {
 });
 
 test("setting a nested property emits the expected events", function() {
+    expect(1);
     var Model = Backbone.Model.extend({
 
     });
@@ -539,6 +542,7 @@ test("setting a nested property emits the expected events", function() {
 });
 
 test("Can unset a nested property", function() {
+    expect(2);
     var Model = Backbone.Model.extend({
         defaults: {
             please: {
@@ -554,6 +558,7 @@ test("Can unset a nested property", function() {
 });
 
 test("Change event for a field set by a mutator should be emitted after setters are executed", function() {
+    expect(1);
     var Model = Backbone.Model.extend({
         defaults: {
             firstName: "Hot",
@@ -580,6 +585,7 @@ test("Change event for a field set by a mutator should be emitted after setters 
 });
 
 test("Change event for the mutator should be emitted after setters are executed", function() {
+    expect(1);
     var Model = Backbone.Model.extend({
         defaults: {
             firstName: "Bob",
@@ -606,6 +612,7 @@ test("Change event for the mutator should be emitted after setters are executed"
 });
 
 test("Mutators can have dotted names", function() {
+    expect(2);
     var Model = Backbone.Model.extend({
         defaults: {
             dont: {
@@ -627,6 +634,7 @@ test("Mutators can have dotted names", function() {
 });
 
 test("Setting a nested property will create intermediary objects when needed", function() {
+    expect(1);
     var Model = Backbone.Model.extend({
     });
     var model = new Model();
@@ -657,6 +665,7 @@ test("Can serialize mutated model with only a setter", function () {
 });
 
 test("Can set mutated, nested and 'normal' values in the same call to save", function() {
+    expect(3);
     var Model = Backbone.Model.extend({
         mutators: {
             mutato: {

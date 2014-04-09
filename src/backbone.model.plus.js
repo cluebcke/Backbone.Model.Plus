@@ -186,9 +186,6 @@
                 changes.push(attribute);
             }
 
-            // Queue up a list of attributes to trigger change events for
-            // (but remove any previously set attributes that have now been
-            // set back to their previous value)
             if (_.isEqual(previousAttributes[attribute], newValue)) {
                 delete this.changed[attribute];
             } else {
