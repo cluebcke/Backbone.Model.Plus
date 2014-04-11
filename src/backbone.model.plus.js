@@ -82,10 +82,12 @@
             if (typeof object !== "object") {
                 return;
             }
-            if (path.length > 1 && typeof object[path[0]] !== "undefined") {
+            if (path.length > 1 && object && typeof object[path[0]] !== "undefined") {
                 return getNestedValue(object[path[0]], path.slice(1));
             } else {
-                return object[path[0]];
+                if (object) {
+                    return object[path[0]];
+                }
             }
         }
 

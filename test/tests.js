@@ -491,11 +491,24 @@ test("can retrieve nested values from model", function () {
     equal(model.get("name.last"), "Banks");
 });
 
-test("returns undefined when attempting to retrieve a nested property whose parent does not exist", function() {
+test("returns undefined when attempting to retrieve a nested property whose top-level parent does not exist", function() {
     expect(1);
     var Model = Backbone.Model.extend({});
     var model = new Model();
-    equal(typeof model.get("this.does.not.exist"), "undefined");
+    equal(typeof model.get("the.thing.does.not.exist"), "undefined");
+});
+
+test("returns undefined when attempting to retrieve a nested property with a missing intermediary parent", function() {
+    expect(1);
+    var Model = Backbone.Model.extend({
+        defaults: {
+            the: {
+                thing: null
+            }
+        }
+    });
+    var model = new Model();
+    equal(typeof model.get("the.thing.does.not.exist"), "undefined");
 });
 
 test("can set a new nested value on model", function() {

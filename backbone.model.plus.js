@@ -1,6 +1,6 @@
 /*! backbone.model.plus - v0.2.0
 ------------------------------
-Build @ 2014-04-09
+Build @ 2014-04-11
 Documentation and Full License Available at:
 https://github.com/cluebcke/backbone.model.plus
 https://github.com/cluebcke/backbone.model.plus.git
@@ -107,10 +107,12 @@ IN THE SOFTWARE.*/
             if (typeof object !== "object") {
                 return;
             }
-            if (path.length > 1 && typeof object[path[0]] !== "undefined") {
+            if (path.length > 1 && object && typeof object[path[0]] !== "undefined") {
                 return getNestedValue(object[path[0]], path.slice(1));
             } else {
-                return object[path[0]];
+                if (object) {
+                    return object[path[0]];
+                }
             }
         }
 
