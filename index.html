@@ -1,18 +1,484 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="https://rawgithub.com/jeromegn/DocumentUp/master/documentup.js"></script>
-    <script language="javascript">
-      $(function(){
-        DocumentUp.document({
-          repo: "asciidisco/Backbone.Mutators",
-          name: "Backbone.Mutators",
-          travis: false,
-          twitter: ["asciidisco"]
-        });
-      });
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640" />
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
     </script>
+    <title>Backbone.Model.Plus by cluebcke</title>
   </head>
-  <body></body>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/cluebcke/Backbone.Model.Plus">View on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>Backbone.Model.Plus</h1>
+            <h2>Backbone.Model plugin that provides support for computed values (getters),  mutators (setters), and nested data structures.</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/cluebcke/Backbone.Model.Plus/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/cluebcke/Backbone.Model.Plus/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+
+      <span class="banner-fix"></span>
+
+
+      <section id="main_content">
+        <h2>
+<a name="backbonemodelplus" class="anchor" href="#backbonemodelplus"><span class="octicon octicon-link"></span></a>Backbone.Model.Plus</h2>
+
+<p>Backbone plugin that provides support for accessors, mutators and nested
+objects.</p>
+
+<h2>
+<a name="build-status-project-page-annotated-source--tests" class="anchor" href="#build-status-project-page-annotated-source--tests"><span class="octicon octicon-link"></span></a>Build Status, Project Page, Annotated Source &amp; Tests</h2>
+
+<p><a href="http://travis-ci.org/asciidisco/Backbone.Mutators"><img src="https://secure.travis-ci.org/asciidisco/Backbone.Mutators.png?branch=master" alt="Build Status"></a>
+<a href="https://saucelabs.com/u/asciidisco"><img src="https://saucelabs.com/buildstatus/asciidisco" alt="Unit Test Status"></a><br><br><a href="http://asciidisco.github.com/Backbone.Mutators/index.html">Project Page</a><br><a href="http://asciidisco.github.com/Backbone.Mutators/docs/backbone.mutators.html">Docs</a><br><a href="http://asciidisco.github.com/Backbone.Mutators/test/index.html">Tests</a><br><a href="http://search.npmjs.org/#/Backbone.Mutators">NPM registry</a></p>
+
+<h2>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>Backbone.Model.Plus is a fork of [Backbone.Mutators]((<a href="http://asciidisco.github.com/Backbone.Mutators/index.html">http://asciidisco.github.com/Backbone.Mutators/index.html</a>)
+that adds support for nested objects in the model (e.g. name.first). I created
+this fork because I love and rely upon Backbone.Mutators, but since it overrides
+Backbone's get() and set() methods, I can't use it in conjunction with other
+model plugins (like <a href="https://github.com/powmedia/backbone-deep-model">backbone-deep-model</a>).</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>The plugin itself implements the Universal Module Definition (UMD).
+You can use it with a CommonJS like loader, or with an AMD loader or via
+vanilla javascript.</p>
+
+<p>The plugin has two dependencies, underscore.js and backbone.js</p>
+
+<h3>
+<a name="download" class="anchor" href="#download"><span class="octicon octicon-link"></span></a>Download</h3>
+
+<p>You can directly download the
+<a href="https://raw.github.com/cluebcke/Backbone.Model.Plus/master/backbone.model.plus.js">Development Version</a>
+or the
+<a href="https://raw.github.com/cluebcke/Backbone.Model.Plus/master/backbone.model.plus.min.js">Production Version</a>
+from the root folder</p>
+
+<h2>
+<a name="integration" class="anchor" href="#integration"><span class="octicon octicon-link"></span></a>Integration</h2>
+
+<h3>
+<a name="amd" class="anchor" href="#amd"><span class="octicon octicon-link"></span></a>AMD</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// AMD</span>
+<span class="nx">require</span><span class="p">([</span><span class="s1">'underscore'</span><span class="p">,</span> <span class="s1">'backbone'</span><span class="p">,</span> <span class="s1">'path/to/backbone.model.plus'</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">,</span> <span class="nx">ModelPlus</span><span class="p">)</span> <span class="p">{</span>
+  <span class="cm">/* Do stuff with Backbone here */</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="commonjs" class="anchor" href="#commonjs"><span class="octicon octicon-link"></span></a>CommonJS</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// CommonJS</span>
+<span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'underscore'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">Backbone</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'backbone'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">Mutators</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'backbone.model.plus'</span><span class="p">);</span>
+</pre></div>
+
+<h3>
+<a name="vanilla-js" class="anchor" href="#vanilla-js"><span class="octicon octicon-link"></span></a>Vanilla JS</h3>
+
+<div class="highlight highlight-html"><pre><span class="c">&lt;!-- Vanilla javascript --&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"path/to/underscore.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"path/to/backbone.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"path/to/backbone.model.plus.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">Backbone</span><span class="p">.</span><span class="nx">ModelPlus</span><span class="p">);</span> <span class="c1">// Backbone and the Mutators property are globals</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Some lines of code explain more then thousand words...</p>
+
+<h3>
+<a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a>Basic usage</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">fullname</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">firstname</span><span class="o">:</span> <span class="s1">'Sugar'</span><span class="p">,</span>
+        <span class="nx">lastname</span><span class="o">:</span> <span class="s1">'Daddy'</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+
+ <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+ <span class="c1">// use get to get the 'mutated' value</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'fullname'</span><span class="p">)</span> <span class="c1">// 'Sugar Daddy'</span>
+ <span class="c1">// serialize the model and see the 'mutated' value in the resulting JSON</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span> <span class="c1">// '{firstname: 'Sugar', lastname: 'Daddy', fullname: 'Sugar Daddy'}'</span>
+</pre></div>
+
+<h3>
+<a name="override-getters" class="anchor" href="#override-getters"><span class="octicon octicon-link"></span></a>Override getters</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">State</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">status</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span> <span class="o">?</span> <span class="s1">'Workish'</span> <span class="o">:</span> <span class="s1">'Bad bad error'</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">status</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+
+ <span class="kd">var</span> <span class="nx">state</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">State</span><span class="p">();</span>
+ <span class="c1">// use get to get the 'mutated' value</span>
+ <span class="nx">state</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">)</span> <span class="c1">// 'Workish'</span>
+ <span class="c1">// serialize the model and see the 'mutated' value in the resulting JSON</span>
+ <span class="nx">state</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span> <span class="c1">// '{status: 'Workish'}'</span>
+</pre></div>
+
+<h3>
+<a name="use-setters" class="anchor" href="#use-setters"><span class="octicon octicon-link"></span></a>Use setters</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">fullname</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">set</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">set</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">names</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">firstname</span><span class="o">:</span> <span class="s1">'Sugar'</span><span class="p">,</span>
+        <span class="nx">lastname</span><span class="o">:</span> <span class="s1">'Daddy'</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+
+ <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+ <span class="c1">// use get to get the 'mutated' value</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'fullname'</span><span class="p">,</span> <span class="s1">'Big Mama'</span><span class="p">,</span> <span class="p">{</span><span class="nx">silent</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+ <span class="c1">// serialize the model and see the 'mutated' value in the resulting JSON</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'fullname'</span><span class="p">)</span> <span class="c1">// 'Big Mama'</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">);</span> <span class="c1">// 'Big'</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span> <span class="c1">// 'Mama'</span>
+</pre></div>
+
+<h3>
+<a name="catch-model-events" class="anchor" href="#catch-model-events"><span class="octicon octicon-link"></span></a>Catch model events</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">fullname</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">set</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">set</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">names</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">firstname</span><span class="o">:</span> <span class="s1">'Sugar'</span><span class="p">,</span>
+        <span class="nx">lastname</span><span class="o">:</span> <span class="s1">'Daddy'</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+
+ <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+
+ <span class="c1">// bind mutator event</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">'mutators:set:fullname'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Somebody sets a full name'</span><span class="p">);</span>
+ <span class="p">});</span>
+
+ <span class="c1">// bind model events</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">'change:firstname'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Somebody changed the first name'</span><span class="p">);</span>
+ <span class="p">});</span>
+
+  <span class="c1">// bind model events</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">'change:lastname'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Somebody changed the last name'</span><span class="p">);</span>
+ <span class="p">});</span>
+
+ <span class="c1">// use get to get the 'mutated' value</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'fullname'</span><span class="p">,</span> <span class="s1">'Big Mama'</span><span class="p">);</span>
+
+ <span class="c1">// serialize the model and see the 'mutated' value in the resulting JSON</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'fullname'</span><span class="p">)</span> <span class="c1">// 'Big Mama'</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">);</span> <span class="c1">// 'Big'</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span> <span class="c1">// 'Mama'</span>
+</pre></div>
+
+<h3>
+<a name="silence-mutator-events-while-keeping-the-model-events-fired" class="anchor" href="#silence-mutator-events-while-keeping-the-model-events-fired"><span class="octicon octicon-link"></span></a>Silence mutator events (while keeping the model events fired)</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">fullname</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">set</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">set</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">names</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">firstname</span><span class="o">:</span> <span class="s1">'Sugar'</span><span class="p">,</span>
+        <span class="nx">lastname</span><span class="o">:</span> <span class="s1">'Daddy'</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+
+ <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+
+ <span class="c1">// bind mutator event</span>
+ <span class="c1">// will never be run</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">'mutators:set:fullname'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Somebody sets a full name'</span><span class="p">);</span>
+ <span class="p">});</span>
+
+ <span class="c1">// bind model events</span>
+ <span class="c1">// will still run</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">'change:firstname'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Somebody changed the first name'</span><span class="p">);</span>
+ <span class="p">});</span>
+
+ <span class="c1">// bind model events</span>
+ <span class="c1">// will still run</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">'change:lastname'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Somebody changed the last name'</span><span class="p">);</span>
+ <span class="p">});</span>
+
+ <span class="c1">// use get to get the 'mutated' value</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'fullname'</span><span class="p">,</span> <span class="s1">'Big Mama'</span><span class="p">,</span> <span class="p">{</span><span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span><span class="nx">silence</span><span class="o">:</span> <span class="kc">true</span><span class="p">}});</span>
+
+ <span class="c1">// serialize the model and see the 'mutated' value in the resulting JSON</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'fullname'</span><span class="p">)</span> <span class="c1">// 'Big Mama'</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">);</span> <span class="c1">// 'Big'</span>
+ <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span> <span class="c1">// 'Mama'</span>
+</pre></div>
+
+<h3>
+<a name="use-mutated-setters-and-call-the-original-setter-within" class="anchor" href="#use-mutated-setters-and-call-the-original-setter-within"><span class="octicon octicon-link"></span></a>Use mutated setters and call the original setter within</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">Spicy</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">iAcceptOnlyLowercaseStuff</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">set</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">set</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// call the original setter with the lowercased value</span>
+                <span class="nx">set</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">(),</span> <span class="nx">options</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">iAcceptOnlyLowercaseStuff</span><span class="o">:</span> <span class="s1">'sugar'</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+
+ <span class="kd">var</span> <span class="nx">spicy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spicy</span><span class="p">();</span>
+ <span class="c1">// use get to get the 'mutated' value</span>
+ <span class="nx">spicy</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'iAcceptOnlyLowercaseStuff'</span><span class="p">,</span> <span class="s1">'SALT'</span><span class="p">);</span>
+ <span class="nx">spicy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'iAcceptOnlyLowercaseStuff'</span><span class="p">)</span> <span class="c1">// 'salt'</span>
+</pre></div>
+
+<h3>
+<a name="define-one-getter--setter-method" class="anchor" href="#define-one-getter--setter-method"><span class="octicon octicon-link"></span></a>Define one getter / setter method</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">fullname</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">set</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="nx">key</span><span class="p">){</span>
+                <span class="kd">var</span> <span class="nx">names</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">firstname</span><span class="o">:</span> <span class="s1">'Sugar'</span><span class="p">,</span>
+        <span class="nx">lastname</span><span class="o">:</span> <span class="s1">'Daddy'</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="define-multiple-mutators" class="anchor" href="#define-multiple-mutators"><span class="octicon octicon-link"></span></a>Define multiple mutators</h3>
+
+<div class="highlight highlight-javascript"><pre> <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="c1">// Define mutator properties</span>
+    <span class="nx">mutators</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">fullname</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">set</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">set</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">names</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">,</span> <span class="nx">names</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">options</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'firstname'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'lastname'</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nx">password</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">md5</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">password</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">firstname</span><span class="o">:</span> <span class="s1">'Sugar'</span><span class="p">,</span>
+        <span class="nx">lastname</span><span class="o">:</span> <span class="s1">'Daddy'</span>
+    <span class="p">}</span>
+ <span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="define-a-getter-as-transient" class="anchor" href="#define-a-getter-as-transient"><span class="octicon octicon-link"></span></a>Define a getter as transient</h3>
+
+<p>Defining a getter as transient means that it will be omitted when Backbone saves the model. This is
+useful if the backend system (whatever Backbone is syncing to) fails if you send it a property that does
+not actually exist on the model. Note that this only works for mutators defined with a <code>get()</code>
+function.</p>
+
+<p>In the example below, the <code>fullName</code> property will be available when toJSON is called under
+non-syncing circumstances--for example, when providing this model to a template--but will be omitted
+from the JSON when sync is called (because you called the <code>sync()</code> or <code>save()</code> method), and will not
+be sent to the server.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">defaults</span><span class="o">:</span><span class="p">{</span>
+    <span class="nx">firstName</span><span class="o">:</span><span class="s2">"Iain"</span><span class="p">,</span>
+    <span class="nx">middleInit</span><span class="o">:</span><span class="s2">"M"</span><span class="p">,</span>
+    <span class="nx">lastName</span><span class="o">:</span><span class="s2">"Banks"</span>
+  <span class="p">},</span>
+  <span class="nx">mutators</span><span class="o">:</span><span class="p">{</span>
+    <span class="nx">fullName</span><span class="o">:</span><span class="p">{</span>
+      <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">fullName</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"firstName"</span><span class="p">);</span>
+        <span class="nx">fullName</span> <span class="o">+=</span> <span class="s2">" "</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"middleInit"</span><span class="p">);</span>
+        <span class="nx">fullName</span> <span class="o">+=</span> <span class="s2">". "</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"lastName"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">fullName</span><span class="p">;</span>
+      <span class="p">},</span>
+      <span class="kr">transient</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="further-reading" class="anchor" href="#further-reading"><span class="octicon octicon-link"></span></a>Further reading</h2>
+
+<p>James Brown (<a href="https://github.com/ibjhb/Exploring-Backbone.Mutators">@ibjhb</a>)
+has written a blog article about Mutators (<a href="http://ja.mesbrown.com/2012/03/exploring-backbone-mutators-plugin/">Exploring Backbone.Mutators</a>)</p>
+
+<h2>
+<a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h2>
+
+<h3>
+<a name="041" class="anchor" href="#041"><span class="octicon octicon-link"></span></a>0.4.1</h3>
+
+<ul>
+<li>Fixes <a href="https://github.com/asciidisco/Backbone.Mutators/pull/22">#22</a>
+</li>
+<li>Fixes <a href="https://github.com/asciidisco/Backbone.Mutators/pull/24">#24</a>
+</li>
+</ul><h3>
+<a name="031" class="anchor" href="#031"><span class="octicon octicon-link"></span></a>0.3.1</h3>
+
+<ul>
+<li>Change get context to modal instead of attributes</li>
+<li>Added single getter / setter method</li>
+</ul><h3>
+<a name="031-1" class="anchor" href="#031-1"><span class="octicon octicon-link"></span></a>0.3.1</h3>
+
+<ul>
+<li>Change get context to modal instead of attributes</li>
+<li>Added single getter / setter method</li>
+</ul><h3>
+<a name="030" class="anchor" href="#030"><span class="octicon octicon-link"></span></a>0.3.0</h3>
+
+<ul>
+<li>Removed the Cake based build process and moved to grunt</li>
+<li>Mutators now integrates itself to backbone, no more manual extending needed</li>
+<li>Added the {mutator: {silent: true}} option to prevent mutator set events from firering</li>
+<li>Added unit tests for the new features</li>
+<li>Moved from jslint to jshint</li>
+<li>Tweaked docs</li>
+<li>Removed not needed jquery and qunit-logging submodule / npm dependencies</li>
+</ul><h3>
+<a name="020" class="anchor" href="#020"><span class="octicon octicon-link"></span></a>0.2.0</h3>
+
+<ul>
+<li>Added the original Backbone.Model.set function as a fourth paramter for the mutated set</li>
+<li>Added a 'mutators:set:{{YOUR_MUTATOR_PROPERTY}}' event when setting mutated properties</li>
+<li>Added unit tests for the new features</li>
+<li>Extended/fixed documentation</li>
+<li>Added inline version tag [NOTE: Version 0.2.0 is fully backwards compatible]</li>
+</ul><h3>
+<a name="010" class="anchor" href="#010"><span class="octicon octicon-link"></span></a>0.1.0</h3>
+
+<ul>
+<li>Initial Release</li>
+</ul>
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/cluebcke">cluebcke</a> can be found on <a href="https://github.com/cluebcke/Backbone.Model.Plus">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+    
+  </body>
 </html>
