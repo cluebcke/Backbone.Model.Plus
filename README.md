@@ -1,6 +1,6 @@
 ## Backbone.Model.Plus
-Backbone plugin that provides support for accessors, mutators and nested
-objects.
+Backbone.Model plugin that provides support for computed values (getters),
+mutators (setters), and nested data structures.
 
 ## Build Status, Project Page, Annotated Source & Tests
 [![Build Status](https://secure.travis-ci.org/asciidisco/Backbone.Mutators.png?branch=master)](http://travis-ci.org/asciidisco/Backbone.Mutators)
